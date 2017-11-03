@@ -5,7 +5,7 @@
 int main() {
   printf("the game\n");
   SymTable *tabla = new_sym_table();
-  if(insert_into(tabla, "x", INTEGER, 0))
+  if(insert_into(tabla, "x", INTEGER, GLOBAL))
     printf("Inserción exitosa\n");
 
   TableEntry *entrada = get_entry(tabla, "x");

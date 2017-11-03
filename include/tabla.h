@@ -8,13 +8,24 @@ typedef enum _type {
   STRING
 } Type;
 
+typedef enum _scope {
+  GLOBAL,
+  LOCAL,
+  PARAM
+} Scope;
+
+// Una entrada de la tabla es un identificador, un tipo y un alcance
+// El tipo probablemente tenga que cambiar porque los tipos también
+// incluyen los definidos por el usuario.
+// El alcance se expresa como un enumerador con tres posibles
+// valores: global, local y parámetro.
+
 typedef struct _entry {
   gchar *id;
   Type type;
-  gint scope;
-  
+  Scope scope;
 } TableEntry;
 
 SymTable *new_sym_table();
-gboolean insert_into(SymTable*, gchar*, Type, gint);
+gboolean insert_into(SymTable*, gchar*, Type, Scope);
 TableEntry *get_entry(SymTable*, gchar*);
