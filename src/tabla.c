@@ -4,18 +4,17 @@
 
 // SymTable = GHashTable de GLib
 // TableEntry {
-//   GString *id;
-//   Type type
+//   gchar *id;
+//   gchar *type
 //   Scope scope;
 // }
-// Type = INTEGER, STRING (esto tiene que cambiar)
 // Scope = GLOBAL, LOCAL, PARAM
 
 SymTable *new_sym_table() {
   return g_hash_table_new(NULL, NULL);
 }
 
-TableEntry *new_entry(gchar *id, Type type, Scope scope) {
+TableEntry *new_entry(gchar *id, gchar *type, Scope scope) {
   TableEntry *entry = g_new0(TableEntry, 1);
   entry->id = id;
   entry->type = type;
@@ -23,7 +22,7 @@ TableEntry *new_entry(gchar *id, Type type, Scope scope) {
   return entry;
 }
 
-gboolean insert_into(SymTable *table, gchar *id, Type type, Scope scope){
+gboolean insert_into(SymTable *table, gchar *id, gchar *type, Scope scope){
   TableEntry *entry = new_entry(id, type, scope);
   return g_hash_table_insert(table, id, entry);
 }

@@ -3,10 +3,6 @@
 // Nuestra tabla de símbolos será solamente un diccionario de GLib
 typedef GHashTable SymTable;
 
-typedef enum _type {
-  INTEGER,
-  STRING
-} Type;
 
 typedef enum _scope {
   GLOBAL,
@@ -22,7 +18,7 @@ typedef enum _scope {
 
 typedef struct _entry {
   gchar *id;
-  Type type;
+  gchar *type;
   Scope scope;
 } TableEntry;
 
