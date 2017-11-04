@@ -1,7 +1,10 @@
 #include <glib.h>
 
 // Nuestra tabla de símbolos será solamente un diccionario de GLib
-typedef GHashTable SymTable;
+typedef struct _sym_table {
+  struct _sym_table *father;
+  GHashTable *table;
+} SymTable;
 
 
 typedef enum _scope {
@@ -23,5 +26,6 @@ typedef struct _entry {
 } TableEntry;
 
 SymTable *new_sym_table();
-gboolean insert_into(SymTable*, gchar*, Type, Scope);
+gboolean insert_into(SymTable*, gchar*, gchar *, Scope);
 TableEntry *get_entry(SymTable*, gchar*);
+SymTable *get_father(SymTable *);
