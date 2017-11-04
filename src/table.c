@@ -51,3 +51,7 @@ TableEntry *get_entry_until_global(SymTable *table, gchar* id){
 void serror(char* s) {
     fprintf(stderr, "THIS SYMBOL IS ALERADY DEFINED: %s.\n",s);
 }
+
+void snerror(char* s) {
+    fprintf(stderr, "THIS SYMBOL HAS NOT BEING DEFINED: %s.\n",s);
+}

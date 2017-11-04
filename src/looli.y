@@ -174,7 +174,7 @@ expr :
     ID
     {
         if (get_entry_until_global(top,$1) == NULL)
-            serror($1);
+            snerror($1);
     }
         '=' expr { char *s = malloc(1024);
                   sprintf(s, "\n[ASSIGN %s %s]", $1, $4);
@@ -182,7 +182,7 @@ expr :
     | expr '.' ID
     {
         if (get_entry_until_global(top,$3) == NULL)
-            serror($3);
+            snerror($3);
     }
      '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -191,7 +191,7 @@ expr :
     | expr '.' SUPER '.' ID
     {
         if (get_entry_until_global(top,$5) == NULL)
-            serror($5);
+            snerror($5);
     }
      '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -200,7 +200,7 @@ expr :
     | ID
     {
         if (get_entry_until_global(top,$1) == NULL)
-            serror($1);
+            snerror($1);
     }
     '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -221,7 +221,7 @@ expr :
     | SWITCH '(' ID
     {
         if (get_entry_until_global(top,$3) == NULL)
-            serror($3);
+            snerror($3);
     }
      ')' '{' case_list default '}'
                 { char *s = malloc(1024);
@@ -267,7 +267,7 @@ expr :
     | ID
     {
         if (get_entry_until_global(top,$1) == NULL)
-            serror($1);
+            snerror($1);
     }
          { char* s = malloc(512);
                   sprintf(s, "\n[ID %s]", $1);
