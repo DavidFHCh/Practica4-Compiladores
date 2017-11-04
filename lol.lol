@@ -4,7 +4,7 @@ class Stupid inherits Dumb {
 
   int f(int a, int b){
     b = true;
-    b = false;
+    b = 1 + 2;
     a = 0;
     switch(a){
       case 0:

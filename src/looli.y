@@ -5,6 +5,7 @@
 #include "table.h"
 
 void yyerror (char*);
+int yylex();
 int empty;
 int errors = 0;
 extern FILE *yyin;
@@ -162,23 +163,23 @@ expr :
                   $$ = s; }
     | expr '+' expr
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[ADD %s %s]", $1);
+                  sprintf(s, "\n[ADD %s %s]", $1, $3);
                   $$ = s; }
     | expr '-' expr
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[MIN %s %s]", $1);
+                  sprintf(s, "\n[MIN %s %s]", $1, $3);
                   $$ = s; }
     | expr '*' expr
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[MUL %s %s]", $1);
+                  sprintf(s, "\n[MUL %s %s]", $1, $3);
                   $$ = s; }
     | expr '/' expr
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[DIV %s %s]", $1);
+                  sprintf(s, "\n[DIV %s %s]", $1, $3);
                   $$ = s; }
     | expr '<' expr
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[LT %s %s]", $1);
+                  sprintf(s, "\n[LT %s %s]", $1, $3);
                   $$ = s; }
     | expr LE expr
                 { char *s = malloc(1024);
@@ -211,7 +212,7 @@ expr_arg_list :
     | expr      { $$ = $1; }
     | expr_arg_list ',' expr
                 { char *s = malloc(1024);
-                  sprintf(s, "%s \n%s", $3);
+                  sprintf(s, "%s \n%s", $1, $3);
                   $$ = $3; }
     ;
 %%
