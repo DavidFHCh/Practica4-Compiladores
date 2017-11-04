@@ -37,6 +37,5 @@ executable(
   bisonfiles, 
   dependencies : glibdep, 
   include_directories : inc, 
-  link_with: tabla_lib
 
 )
