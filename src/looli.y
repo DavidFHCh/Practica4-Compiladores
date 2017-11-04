@@ -14,6 +14,9 @@ extern FILE* yyout;
 extern int yylineno;
 char *result;
 
+SymTable* top;
+SymTable* aux;
+
 %}
 
 
@@ -54,13 +57,25 @@ program :
     ;
 
 class:
-    CLASS TYPE '{' feature_list '}'
+    CLASS TYPE '{'
+            {
+                //P04
+                top = new_sym_table(NULL);
+                insert_into(top,"this",$2,GLOBAL);
+            }
+  feature_list '}'
                 { char *s = malloc(1024);
-                  sprintf(s, "[CLASS %s \n\t%s]", $2, $4);
+                  sprintf(s, "[CLASS %s \n\t%s]", $2, $5);
                   $$ = s; }
-    | CLASS TYPE INHERITS TYPE '{' feature_list '}'
+    | CLASS TYPE INHERITS TYPE '{'
+            {
+                //P04
+                top = new_sym_table(NULL);
+                insert_into(top,"this",$2,GLOBAL);
+            }
+                  feature_list '}'
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[CLASS %s OF %s \n\t%s]", $2, $4, $6);
+                  sprintf(s, "\n[CLASS %s OF %s \n\t%s]", $2, $4, $7);
                   $$ = s; }
     ;
 
@@ -73,17 +88,41 @@ feature_list :
     ;
 
 feature :
-    TYPE ID '(' formal_list ')' '{' expr_list RETURN expr ';' '}'
+    TYPE ID '('
+            {
+                //P04
+                if (get_entry_until_global(top,$2) != NULL)
+                    serror($2);
+                else
+                    insert_into(top,$2,$1,GLOBAL);
+                aux = new_sym_table(top);
+                top = aux;
+            }
+    formal_list ')' '{' expr_list RETURN expr ';' '}'
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[METHOD %s %s \n\t%s \n\t%s \n[RETURN %s]]", $2, $1, $4, $7, $9);
+                  sprintf(s, "\n[METHOD %s %s \n\t%s \n\t%s \n[RETURN %s]]", $2, $1, $5, $8, $10);
                   $$ = s; }
     | TYPE ID ';'
                 { char *s = malloc(1024);
                   sprintf(s, "\n[ATTRIBUTE %s %s]", $2, $1);
-                  $$ = s; }
-    | TYPE ID '=' expr ';'
+                  $$ = s;
+                  //P04
+                  if (get_entry_until_global(top,$2) != NULL)
+                      serror($2);
+                  else
+                      insert_into(top,$2,$1,GLOBAL);
+                }
+    | TYPE ID
+        {
+            //P04
+            if (get_entry_until_global(top,$2) != NULL)
+                serror($2);
+            else
+                insert_into(top,$2,$1,GLOBAL);
+        }
+         '=' expr ';'
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[ATTRIBUTE_ASSIGNMENT %s %s %s]", $2, $1, $4);
+                  sprintf(s, "\n[ATTRIBUTE_ASSIGNMENT %s %s %s]", $2, $1, $5);
                   $$ = s; }
     ;
 
@@ -107,7 +146,13 @@ expr_list :
 formal :
     TYPE ID     { char *s = malloc(256);
                   sprintf(s, "\n[FORMAL %s %s]\n", $2, $1);
-                  $$ = s; }
+                  $$ = s;
+                  //P04
+                  if (get_entry_until_global(top,$2) != NULL)
+                      serror($2);
+                  else
+                      insert_into(top,$2,$1,PARAM);
+                }
     ;
 
 case_list :
@@ -126,20 +171,40 @@ default :
     ;
 
 expr :
-    ID '=' expr { char *s = malloc(1024);
-                  sprintf(s, "\n[ASSIGN %s %s]", $1, $3);
+    ID
+    {
+        if (get_entry_until_global(top,$1) != NULL)
+            serror($1);
+    }
+        '=' expr { char *s = malloc(1024);
+                  sprintf(s, "\n[ASSIGN %s %s]", $1, $4);
                   $$ = s; }
-    | expr '.' ID '(' expr_arg_list ')'
+    | expr '.' ID
+    {
+        if (get_entry_until_global(top,$3) != NULL)
+            serror($3);
+    }
+     '(' expr_arg_list ')'
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[CALL %s %s %s]", $1, $3, $5);
+                  sprintf(s, "\n[CALL %s %s %s]", $1, $3, $6);
                   $$ = s; }
-    | expr '.' SUPER '.' ID '(' expr_arg_list ')'
+    | expr '.' SUPER '.' ID
+    {
+        if (get_entry_until_global(top,$5) != NULL)
+            serror($5);
+    }
+     '(' expr_arg_list ')'
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[SUPER_CALL %s %s %s]", $1, $5, $7);
+                  sprintf(s, "\n[SUPER_CALL %s %s %s]", $1, $5, $8);
                   $$ = s; }
-    | ID '(' expr_arg_list ')'
+    | ID
+    {
+        if (get_entry_until_global(top,$1) != NULL)
+            serror($1);
+    }
+    '(' expr_arg_list ')'
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[CALL %s %s]", $1, $3);
+                  sprintf(s, "\n[CALL %s %s]", $1, $4);
                   $$ = s; }
     | IF '(' expr ')' '{' expr_list '}'
                 { char *s = malloc(1024);
@@ -153,9 +218,14 @@ expr :
                 { char *s = malloc(1024);
                   sprintf(s, "\n[WHILE %s %s]", $3, $6);
                   $$ = s; }
-    | SWITCH '(' ID ')' '{' case_list default '}'
+    | SWITCH '(' ID
+    {
+        if (get_entry_until_global(top,$3) != NULL)
+            serror($3);
+    }
+     ')' '{' case_list default '}'
                 { char *s = malloc(1024);
-                  sprintf(s, "\n[SWITCH %s %s %s]", $3, $6, $7);
+                  sprintf(s, "\n[SWITCH %s %s %s]", $3, $7, $8);
                   $$ = s; }
     | NEW TYPE
                 { char *s = malloc(1024);
@@ -194,7 +264,12 @@ expr :
                   $$ = s; }
     | '(' expr ')'
                 { $$ = $2; }
-    | ID        { char* s = malloc(512);
+    | ID
+    {
+        if (get_entry_until_global(top,$1) != NULL)
+            serror($1);
+    }
+         { char* s = malloc(512);
                   sprintf(s, "\n[ID %s]", $1);
                   $$ = s; }
     | INTEGER   { char* s = malloc(512);
@@ -216,6 +291,10 @@ expr_arg_list :
                   $$ = $3; }
     ;
 %%
+
+void serror(char* s) {
+    fprintf(stderr, "THIS SYMBOL IS ALERADY DEFINED: %s.",s);
+}
 
 void yyerror(char* s) {
     errors++;
