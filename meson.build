@@ -5,14 +5,14 @@ flex = find_program('flex')
 bison = find_program('bison')
 
 flex_gen = generator(
-  flex, 
-  output: '@BASENAME@.yy.c', 
+  flex,
+  output: '@BASENAME@.yy.c',
   arguments: ['-o', '@OUTPUT@', '@INPUT@']
 )
 
 bison_gen = generator(
-  bison, 
-  output: ['@BASENAME@.c', '@BASENAME@.h'], 
+  bison,
+  output: ['@BASENAME@.c', '@BASENAME@.h'],
   arguments: ['-d', '@INPUT@' ,'-o', '@OUTPUT0@']
 )
 
@@ -24,18 +24,18 @@ src = 'src/main.c'
 tabla_src = 'src/table.c'
 inc = include_directories('include')
 tabla_lib = static_library(
-  'table', 
-  tabla_src, 
-  dependencies: glibdep, 
+  'table',
+  tabla_src,
+  dependencies: glibdep,
   include_directories: inc
 )
 
 executable(
-  'p4', 
+  'p4',
   'src/main.c',
-  flexfiles, 
-  bisonfiles, 
-  dependencies : glibdep, 
-  include_directories : inc, 
-
+  flexfiles,
+  bisonfiles,
+  dependencies : glibdep,
+  include_directories : inc,
+  link_with: tabla_lib
 )
