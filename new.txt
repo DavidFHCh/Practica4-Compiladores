@@ -1,0 +1,84 @@
+
+[CLASS Stupid OF Dumb 
+	 
+
+[ATTRIBUTE_ASSIGNMENT a int 
+[CONSTANT 0]] 
+
+[ATTRIBUTE b boolean] 
+
+[METHOD f int 
+	
+[FORMAL a int]
+ 
+
+[FORMAL b int]
+ 
+	 
+[ASSIGN b 
+[CONSTANT TRUE]] 
+[ASSIGN b 
+[ADD 
+[CONSTANT 1] 
+[CONSTANT 2]]] 
+[ASSIGN a 
+[CONSTANT 0]] 
+[SWITCH a  
+[CASE 0 
+	 
+[ASSIGN a 
+[CONSTANT 0]]] 
+[DEFAULT 
+	]] 
+[WHILE 
+[ID a]  
+[ASSIGN a 
+[ADD 
+[ID a] 
+[ID a]]] 
+[ASSIGN a 
+[MIN 
+[ID a] 
+[ID a]]] 
+[EQ 
+[ID a] 
+[ID a]]] 
+[RETURN 
+[ID a]]] 
+
+[METHOD f int 
+	
+[FORMAL a int]
+ 
+
+[FORMAL b int]
+ 
+	 
+[ASSIGN b 
+[CONSTANT TRUE]] 
+[ASSIGN b 
+[CONSTANT FALSE]] 
+[ASSIGN noexiste 
+[CONSTANT 0]] 
+[SWITCH a  
+[CASE 0 
+	 
+[ASSIGN a 
+[CONSTANT 0]]] 
+[DEFAULT 
+	]] 
+[WHILE 
+[ID a]  
+[ASSIGN a 
+[ADD 
+[ID a] 
+[ID a]]] 
+[ASSIGN a 
+[MIN 
+[ID a] 
+[ID a]]] 
+[EQ 
+[ID a] 
+[ID a]]] 
+[RETURN 
+[ID a]]]]

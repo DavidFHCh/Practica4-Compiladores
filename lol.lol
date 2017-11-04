@@ -22,7 +22,7 @@ class Stupid inherits Dumb {
   int f(int a, int b){
     b = true;
     b = false;
-    a = 0;
+    noexiste = 0;
     switch(a){
       case 0:
         a = 0;

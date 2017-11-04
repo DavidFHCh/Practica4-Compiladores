@@ -173,7 +173,7 @@ default :
 expr :
     ID
     {
-        if (get_entry_until_global(top,$1) != NULL)
+        if (get_entry_until_global(top,$1) == NULL)
             serror($1);
     }
         '=' expr { char *s = malloc(1024);
@@ -181,7 +181,7 @@ expr :
                   $$ = s; }
     | expr '.' ID
     {
-        if (get_entry_until_global(top,$3) != NULL)
+        if (get_entry_until_global(top,$3) == NULL)
             serror($3);
     }
      '(' expr_arg_list ')'
@@ -190,7 +190,7 @@ expr :
                   $$ = s; }
     | expr '.' SUPER '.' ID
     {
-        if (get_entry_until_global(top,$5) != NULL)
+        if (get_entry_until_global(top,$5) == NULL)
             serror($5);
     }
      '(' expr_arg_list ')'
@@ -199,7 +199,7 @@ expr :
                   $$ = s; }
     | ID
     {
-        if (get_entry_until_global(top,$1) != NULL)
+        if (get_entry_until_global(top,$1) == NULL)
             serror($1);
     }
     '(' expr_arg_list ')'
@@ -220,7 +220,7 @@ expr :
                   $$ = s; }
     | SWITCH '(' ID
     {
-        if (get_entry_until_global(top,$3) != NULL)
+        if (get_entry_until_global(top,$3) == NULL)
             serror($3);
     }
      ')' '{' case_list default '}'
@@ -266,7 +266,7 @@ expr :
                 { $$ = $2; }
     | ID
     {
-        if (get_entry_until_global(top,$1) != NULL)
+        if (get_entry_until_global(top,$1) == NULL)
             serror($1);
     }
          { char* s = malloc(512);
@@ -292,9 +292,6 @@ expr_arg_list :
     ;
 %%
 
-void serror(char* s) {
-    fprintf(stderr, "THIS SYMBOL IS ALERADY DEFINED: %s.",s);
-}
 
 void yyerror(char* s) {
     errors++;

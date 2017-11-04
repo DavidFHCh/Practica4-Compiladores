@@ -25,6 +25,8 @@ typedef struct _entry {
   Scope scope;
 } TableEntry;
 
+void serror (char*);
+
 SymTable *new_sym_table(SymTable*);
 gboolean insert_into(SymTable*, gchar*, gchar*, Scope);
 TableEntry *get_entry(SymTable*, gchar*);

@@ -47,3 +47,7 @@ TableEntry *get_entry_until_global(SymTable *table, gchar* id){
     return NULL;
   return get_entry_until_global(table->father, id);
 }
+
+void serror(char* s) {
+    fprintf(stderr, "THIS SYMBOL IS ALERADY DEFINED: %s.\n",s);
+}
