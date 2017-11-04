@@ -1,6 +1,6 @@
 #include <glib.h>
 #include <stdio.h>
-#include "tabla.h"
+#include "table.h"
 
 // SymTable = GHashTable de GLib
 // TableEntry {
