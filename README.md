@@ -1,5 +1,10 @@
 # Practica4-Compiladores
 
+Por 
+
+* Carrillo Verduzco Diego
+* Hernández Chiapa David Felipe
+
 ## Cómo compilar el proyecto
 
 El proyecto utiliza [meson](http://mesonbuild.com/) como sistema
