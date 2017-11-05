@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "table.h"
+#include <glib.h>
 
 void yyerror (char*);
 int yylex();
@@ -16,6 +17,8 @@ char *result;
 
 SymTable* top;
 SymTable* aux;
+
+GList *later = NULL;
 
 %}
 
@@ -174,7 +177,7 @@ expr :
     ID
     {
         if (get_entry_until_global(top,$1) == NULL)
-            snerror($1);
+            later = g_list_insert (later,$1,-1);
     }
         '=' expr { char *s = malloc(1024);
                   sprintf(s, "\n[ASSIGN %s %s]", $1, $4);
@@ -182,7 +185,7 @@ expr :
     | expr '.' ID
     {
         if (get_entry_until_global(top,$3) == NULL)
-            snerror($3);
+            later = g_list_insert (later,$3,-1);
     }
      '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -191,7 +194,7 @@ expr :
     | expr '.' SUPER '.' ID
     {
         if (get_entry_until_global(top,$5) == NULL)
-            snerror($5);
+            later = g_list_insert (later,$1,-1);
     }
      '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -200,7 +203,7 @@ expr :
     | ID
     {
         if (get_entry_until_global(top,$1) == NULL)
-            snerror($1);
+            later = g_list_insert (later,$1,-1);
     }
     '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -221,7 +224,7 @@ expr :
     | SWITCH '(' ID
     {
         if (get_entry_until_global(top,$3) == NULL)
-            snerror($3);
+            later = g_list_insert (later,$3,-1);
     }
      ')' '{' case_list default '}'
                 { char *s = malloc(1024);
@@ -266,8 +269,9 @@ expr :
                 { $$ = $2; }
     | ID
     {
-        if (get_entry_until_global(top,$1) == NULL)
-            snerror($1);
+        if (get_entry_until_global(top,$1) == NULL){
+            later = g_list_insert (later,$1,-1);
+        }
     }
          { char* s = malloc(512);
                   sprintf(s, "\n[ID %s]", $1);
@@ -298,6 +302,20 @@ void yyerror(char* s) {
     fprintf(stderr, " SYNTAX ERROR AT %d: '%s'\n\t%s\n",yylineno,yytext,s);
 }
 
+void later_check () {
+    GList *elem;
+    char *item;
+    //gint i = g_list_length (later);
+    //fprintf(stderr,"%d\n",i);
+    for (elem = later; elem; elem = elem->next) {
+        item = elem -> data;
+        //fprintf(stderr,"%s\n",item);
+        if (get_entry_until_global(top,item) == NULL) {
+            snerror(item);
+        }
+    }
+}
+
 int main (int argc, char* argv[]){
     if (argc < 3) {
         printf("If you don't know how to use this, read the README.");
@@ -307,6 +325,7 @@ int main (int argc, char* argv[]){
     yyout = fopen(argv[2], "w");
     yyparse();
     fclose(yyin);
+    later_check();
     if(errors) {
         printf("The program contains %d errors. PLEASE correct them.",errors);
     } else {
