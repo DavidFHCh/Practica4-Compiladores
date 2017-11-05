@@ -325,7 +325,7 @@ void later_check () {
 
 int main (int argc, char* argv[]){
     if (argc < 3) {
-        printf("If you don't know how to use this, read the README.");
+        printf("If you don't know how to use this, read the README.\n");
         return 1;
     }
     yyin = fopen(argv[1],"r");
@@ -335,7 +335,7 @@ int main (int argc, char* argv[]){
     later_check();
     //g_hash_table_foreach(top->table,(GHFunc)print_keys, NULL);
     if(errors) {
-        printf("The program contains %d errors. PLEASE correct them.",errors);
+        printf("The program contains %d errors. PLEASE correct them.\n",errors);
     } else {
         fwrite(result, 1, strlen(result), yyout);
         fclose(yyout);
