@@ -17,6 +17,7 @@ char *result;
 
 SymTable* top;
 SymTable* aux;
+SymTable* anterior;
 
 GList *later = NULL;
 
@@ -99,12 +100,15 @@ feature :
                 else
                     insert_into(top,$2,$1,GLOBAL);
                 aux = new_sym_table(top);
+                anterior = top;
                 top = aux;
             }
     formal_list ')' '{' expr_list RETURN expr ';' '}'
                 { char *s = malloc(1024);
                   sprintf(s, "\n[METHOD %s %s \n\t%s \n\t%s \n[RETURN %s]]", $2, $1, $5, $8, $10);
-                  $$ = s; }
+                  $$ = s;
+                  top = anterior;
+              }
     | TYPE ID ';'
                 { char *s = malloc(1024);
                   sprintf(s, "\n[ATTRIBUTE %s %s]", $2, $1);
