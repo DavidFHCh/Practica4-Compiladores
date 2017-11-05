@@ -6,6 +6,10 @@ typedef struct _sym_table {
   GHashTable *table;
 } SymTable;
 
+typedef struct _unchecked_sym {
+  gchar *id;
+  SymTable *table;
+} UncheckedSym;
 
 typedef enum _scope {
   GLOBAL,
@@ -33,3 +37,4 @@ gboolean insert_into(SymTable*, gchar*, gchar*, Scope);
 TableEntry *get_entry(SymTable*, gchar*);
 SymTable *get_father(SymTable*);
 TableEntry *get_entry_until_global(SymTable*, gchar*);
+UncheckedSym *new_unchecked(gchar *id, SymTable *table);

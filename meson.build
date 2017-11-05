@@ -32,10 +32,17 @@ tabla_lib = static_library(
 
 executable(
   'p4',
-  'src/main.c',
   flexfiles,
   bisonfiles,
   dependencies : glibdep,
   include_directories : inc,
   link_with: tabla_lib
+)
+
+executable(
+  'manitest',
+  'src/main.c',
+  dependencies : glibdep,
+  include_directories : inc,
+  link_with : tabla_lib
 )

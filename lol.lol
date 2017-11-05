@@ -19,6 +19,7 @@ class Stupid inherits Dumb {
     };
     return a;
   }
+
   int f(int a, int b){
     b = true;
     b = false;

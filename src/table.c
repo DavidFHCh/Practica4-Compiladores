@@ -9,11 +9,12 @@
 //   Scope scope;
 // }
 // Scope = GLOBAL, LOCAL, PARAM
+//
 
 SymTable *new_sym_table(SymTable *father) {
   SymTable *table = g_new0(SymTable, 1);
   table->father = father;
-  table->table = g_hash_table_new(NULL, NULL);
+  table->table = g_hash_table_new(g_str_hash, g_str_equal);
   return table;
 }
 
@@ -25,13 +26,21 @@ TableEntry *new_entry(gchar *id, gchar *type, Scope scope) {
   return entry;
 }
 
+UncheckedSym *new_unchecked(gchar *id, SymTable *table) {
+  UncheckedSym *u_sym = g_new0(UncheckedSym, 1);
+  u_sym->id = id;
+  u_sym->table = table;
+  return u_sym;
+}
+
 gboolean insert_into(SymTable *table, gchar *id, gchar *type, Scope scope) {
   TableEntry *entry = new_entry(id, type, scope);
   return g_hash_table_insert(table->table, id, entry);
 }
 
 TableEntry *get_entry(SymTable *table, gchar *id) {
-  return (TableEntry *)g_hash_table_lookup(table->table, id);
+  TableEntry *entry = (TableEntry *)g_hash_table_lookup(table->table, id);
+  return entry;
 }
 
 SymTable *get_father(SymTable *table) {
@@ -39,6 +48,8 @@ SymTable *get_father(SymTable *table) {
 }
 
 TableEntry *get_entry_until_global(SymTable *table, gchar* id){
+  if(table == NULL)
+    return NULL;
   TableEntry *entry;
   entry = get_entry(table, id);
   if(entry != NULL)

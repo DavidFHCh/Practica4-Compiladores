@@ -63,7 +63,6 @@ program :
 class:
     CLASS TYPE '{'
             {
-                //P04
                 top = new_sym_table(NULL);
                 insert_into(top,"this",$2,GLOBAL);
             }
@@ -73,7 +72,6 @@ class:
                   $$ = s; }
     | CLASS TYPE INHERITS TYPE '{'
             {
-                //P04
                 top = new_sym_table(NULL);
                 insert_into(top,"this",$2,GLOBAL);
             }
@@ -94,8 +92,7 @@ feature_list :
 feature :
     TYPE ID '('
             {
-                //P04
-                if (get_entry_until_global(top,$2) != NULL)
+                if (get_entry(top,$2) != NULL)
                     serror($2);
                 else
                     insert_into(top,$2,$1,GLOBAL);
@@ -114,15 +111,17 @@ feature :
                   sprintf(s, "\n[ATTRIBUTE %s %s]", $2, $1);
                   $$ = s;
                   //P04
-                  if (get_entry_until_global(top,$2) != NULL)
+                  if (get_entry(top,$2) != NULL)
                       serror($2);
                   else
                       insert_into(top,$2,$1,GLOBAL);
+                  
+                  
                 }
     | TYPE ID
         {
             //P04
-            if (get_entry_until_global(top,$2) != NULL)
+            if (get_entry(top,$2) != NULL)
                 serror($2);
             else
                 insert_into(top,$2,$1,GLOBAL);
@@ -155,7 +154,7 @@ formal :
                   sprintf(s, "\n[FORMAL %s %s]\n", $2, $1);
                   $$ = s;
                   //P04
-                  if (get_entry_until_global(top,$2) != NULL)
+                  if (get_entry(top,$2) != NULL)
                       serror($2);
                   else
                       insert_into(top,$2,$1,PARAM);
@@ -181,7 +180,7 @@ expr :
     ID
     {
         if (get_entry_until_global(top,$1) == NULL)
-            later = g_list_insert (later,$1,-1);
+            later = g_list_insert (later, new_unchecked($1, top) ,-1);
     }
         '=' expr { char *s = malloc(1024);
                   sprintf(s, "\n[ASSIGN %s %s]", $1, $4);
@@ -189,7 +188,7 @@ expr :
     | expr '.' ID
     {
         if (get_entry_until_global(top,$3) == NULL)
-            later = g_list_insert (later,$3,-1);
+            later = g_list_insert (later, new_unchecked($3, top) ,-1);
     }
      '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -198,7 +197,7 @@ expr :
     | expr '.' SUPER '.' ID
     {
         if (get_entry_until_global(top,$5) == NULL)
-            later = g_list_insert (later,$1,-1);
+            later = g_list_insert (later, new_unchecked($1, top), -1);
     }
      '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -207,7 +206,7 @@ expr :
     | ID
     {
         if (get_entry_until_global(top,$1) == NULL)
-            later = g_list_insert (later,$1,-1);
+            later = g_list_insert (later, new_unchecked($1, top), -1);
     }
     '(' expr_arg_list ')'
                 { char *s = malloc(1024);
@@ -228,7 +227,7 @@ expr :
     | SWITCH '(' ID
     {
         if (get_entry_until_global(top,$3) == NULL)
-            later = g_list_insert (later,$3,-1);
+            later = g_list_insert (later, new_unchecked($3, top), -1);
     }
      ')' '{' case_list default '}'
                 { char *s = malloc(1024);
@@ -274,7 +273,7 @@ expr :
     | ID
     {
         if (get_entry_until_global(top,$1) == NULL){
-            later = g_list_insert (later,$1,-1);
+            later = g_list_insert (later, new_unchecked($1, top) ,-1);
         }
     }
          { char* s = malloc(512);
@@ -300,6 +299,10 @@ expr_arg_list :
     ;
 %%
 
+void print_keys(gpointer key, gpointer value, gpointer user_data){
+  gchar *c = (gchar *)key;
+  printf("llave %s\n", c);
+}
 
 void yyerror(char* s) {
     errors++;
@@ -308,17 +311,17 @@ void yyerror(char* s) {
 
 void later_check () {
     GList *elem;
-    char *item;
-    //gint i = g_list_length (later);
-    //fprintf(stderr,"%d\n",i);
-    for (elem = later; elem; elem = elem->next) {
-        item = elem -> data;
-        //fprintf(stderr,"%s\n",item);
-        if (get_entry_until_global(top,item) == NULL) {
-            snerror(item);
-        }
+    UncheckedSym *sym;
+    TableEntry *entry;
+
+    for (elem = later; elem != NULL ; elem = elem->next) {
+        sym = (UncheckedSym *)elem -> data;
+        entry = get_entry_until_global(sym->table, sym->id);
+        if(entry == NULL)
+          snerror(sym->id);
     }
 }
+
 
 int main (int argc, char* argv[]){
     if (argc < 3) {
@@ -330,6 +333,7 @@ int main (int argc, char* argv[]){
     yyparse();
     fclose(yyin);
     later_check();
+    //g_hash_table_foreach(top->table,(GHFunc)print_keys, NULL);
     if(errors) {
         printf("The program contains %d errors. PLEASE correct them.",errors);
     } else {
@@ -338,3 +342,4 @@ int main (int argc, char* argv[]){
     }
     return 0;
 }
+
